@@ -30,7 +30,7 @@ This project provides a tool to generate detailed testing instructions based on 
 1. **Clone the repository** or download the files.
 
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/jayni07/Automated-TestCase-Generator.git
    ```
 
 2. **Navigate to the project directory**:
