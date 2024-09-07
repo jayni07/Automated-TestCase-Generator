@@ -10,7 +10,7 @@ const app = express();
 const upload = multer({ dest: "uploads/" });
 
 // Initialize Google SDK clients
-const API_KEY = "AIzaSyDe0Z-eymz4I2KvUkV8T-3nrZjywP9RH48"; // Your API key
+const API_KEY = ""; // Your API key
 const fileManager = new GoogleAIFileManager(API_KEY);
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -19,7 +19,7 @@ async function uploadAndGenerateContent(filePath) {
   try {
     // Upload the file to Google
     const uploadResult = await fileManager.uploadFile(filePath, {
-      mimeType: "image/jpeg", // Adjust MIME type if necessary
+      mimeType: "image/jpeg",
       displayName: path.basename(filePath),
     });
 
