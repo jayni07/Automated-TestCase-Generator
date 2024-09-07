@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Testing Instructions Generator</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Describe Testing Instructions</h2>
+
+      <!-- Textarea for Optional Context -->
+      <div class="input-group">
+        <label for="context">Optional Context</label>
+        <textarea
+          id="context"
+          rows="4"
+          placeholder="Enter any additional context for the test case"
+        ></textarea>
+      </div>
+
+      <!-- Image Uploader -->
+      <div class="input-group">
+        <label for="screenshots">Upload Screenshots</label>
+        <input type="file" id="screenshots" multiple accept="image/*" />
+      </div>
+
+      <!-- Preview Images Section -->
+      <div id="preview"></div>
+
+      <!-- Button to Submit Form Data -->
+      <button id="describeButton">Describe Testing Instructions</button>
+
+      <!-- Output Section to Display Test Cases -->
+      <div id="output"></div>
+    </div>
+
+    <script>
+      // Preview uploaded images
+      document
+        .getElementById("screenshots")
+        .addEventListener("change", function () {
+          const previewDiv = document.getElementById("preview");
+          previewDiv.innerHTML = ""; // Clear previous previews
+          const files = this.files;
+
+          if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+              const file = files[i];
+              const reader = new FileReader();
+
+              reader.onload = function (e) {
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.alt = `Screenshot ${i + 1}`;
+                img.style.maxWidth = "200px";
+                img.style.margin = "10px";
+                previewDiv.appendChild(img);
+              };
+
+              reader.readAsDataURL(file);
+            }
+          }
+        });
+
+      document
+        .getElementById("describeButton")
+        .addEventListener("click", async function () {
+          const context = document.getElementById("context").value;
+          const files = document.getElementById("screenshots").files;
+
+          // Check if screenshots are uploaded
+          if (!files.length) {
+            alert("Please upload at least one screenshot");
+            return;
+          }
+
+          // Create a new FormData object to send to the backend
+          const formData = new FormData();
+
+          // Append each screenshot to the FormData object
+          for (let i = 0; i < files.length; i++) {
+            formData.append("screenshots", files[i]);
+          }
+
+          // Append optional context
+          formData.append("context", context);
+
+          // Send the FormData to the backend
+          try {
+            const response = await fetch("/generate-instructions", {
+              method: "POST",
+              body: formData,
+            });
+
+            // Parse the JSON response from the backend
+            const data = await response.json();
+
+            // Check if there was an error from the server
+            if (data.error) {
+              alert("Error: " + data.error);
+              return;
+            }
+
+            // Display the generated test cases in the output section
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = ""; // Clear any previous output
+
+            data.testCases.forEach((testCaseGroup, index) => {
+              const screenshotBlock = document.createElement("div");
+              screenshotBlock.className = "output-block";
+              screenshotBlock.innerHTML = `<h4>Screenshot ${index + 1}</h4>`;
+
+              // Convert markdown to HTML using marked.js
+              testCaseGroup.testCases.split("\n\n").forEach((testCase, idx) => {
+                const htmlContent = marked.parse(testCase); // Convert markdown to HTML
+                //screenshotBlock.innerHTML += `<h5>Test Case ${idx + 1}</h5>`;
+                screenshotBlock.innerHTML += `<div>${htmlContent}</div>`;
+              });
+
+              outputDiv.appendChild(screenshotBlock);
+            });
+          } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred while sending the form data.");
+          }
+        });
+    </script>
+  </body>
+</html>
