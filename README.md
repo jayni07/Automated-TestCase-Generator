@@ -8,6 +8,10 @@ This project provides a tool to generate detailed testing instructions based on 
 - Provide optional context to refine the generated test cases.
 - Displays generated test cases for each screenshot in a user-friendly format using Markdown.
 
+<img src="/photos/1.png" width="600px">
+<img src="/photos/2.png" width="600px">
+<img src="/photos/3.png" width="600px">
+
 ## Technologies Used
 
 - **Frontend**: HTML, CSS, JavaScript
